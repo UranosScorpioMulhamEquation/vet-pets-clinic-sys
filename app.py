@@ -6,7 +6,7 @@ import pandas as pd
 from datetime import datetime
 
 # --- إعدادات الصفحة ---
-st.set_page_config(layout="wide", page_title="نظام إدارة العيادة البيطرية - تخصص حيوانات صغيرة - إعداد د. ملهم احمد")
+st.set_page_config(layout="wide", page_title="نظام إدارة عيادة الحيوانات الأليفة البيطري - إعداد د. ملهم احمد")
 st.markdown("<style>[data-testid='stAppViewContainer'] { direction: rtl; }</style>", unsafe_allow_html=True)
 
 DB_PATH = "clinic.db"
@@ -14,8 +14,10 @@ KEY_FILE = "license.key"
 DOC_NAME_FILE = "doctor_name.txt"
 
 # --- دوال الحماية ---
-def get_machine_id(): return hex(uuid.getnode())
-def generate_password_from_id(mid): 
+def get_machine_id(): 
+    return hex(uuid.getnode())
+
+def generate_password_from_id(mid):
     digits = ''.join(filter(str.isdigit, mid))
     return str(round(abs(int(digits or 0) / 2 * 3.14)))[:6]
 
@@ -23,16 +25,23 @@ if 'authenticated' not in st.session_state:
     st.session_state['authenticated'] = os.path.exists(KEY_FILE)
 
 if not st.session_state['authenticated']:
-    st.title("نظام إدارة العيادة البيطرية - تخصص حيوانات صغيرة - نظام الحماية")
-    st.subheader("راسل المبرمج على البريد الالكتروني للحصول على كلمة المرور")
-    st.subheader("Email : mulham81ahmed@gmail.com")
+    st.title("نظام إدارة عيادة الحيوانات الأليفة البيطري - نظام الحماية")
+    st.subheader("راسل المبرمج للحصول على كلمة المرور")
     st.info(f"رقم معرف الجهاز: {get_machine_id()}")
+    
     pwd = st.text_input("أدخل كلمة المرور", type="password")
+    
     if st.button("دخول"):
         if pwd == generate_password_from_id(get_machine_id()):
-            with open(KEY_FILE, "w") as f: f.write(pwd)
+            with open(KEY_FILE, "w") as f: 
+                f.write(pwd)
             st.session_state['authenticated'] = True
             st.rerun()
+        else:
+            st.error("❌ كلمة المرور غير صحيحة. يرجى التأكد من الرقم والمحاولة مرة أخرى.")
+    
+    st.markdown("---")
+    st.caption("للحصول على كلمة المرور، يرجى مراسلة: mulham81ahmed@gmail.com")
     st.stop()
 
 # --- قاعدة البيانات ---
@@ -55,7 +64,7 @@ def get_saved_doctor():
     return ""
 
 # --- الواجهة ---
-st.title("نظام إدارة العيادة البيطرية - تخصص حيوانات صغيرة - إعداد د. ملهم احمد")
+st.title("نظام إدارة عيادة الحيوانات الأليفة البيطري - إعداد د. ملهم احمد")
 tab1, tab2 = st.tabs(["➕ إدخال بيانات", "🔍 بحث وطباعة"])
 
 with tab1:
@@ -111,3 +120,5 @@ with tab2:
         if not df.empty:
             df.columns = ["رقم السجل", "رقم المعاملة", "التاريخ", "الوقت", "اسم الطبيب", "نوع الحيوان", "التشخيص", "اسم العميل", "رقم العميل", "تفاصيل الرسوم", "المجموع مع الضريبة"]
             st.dataframe(df, use_container_width=True)
+        else:
+            st.warning("لم يتم العثور على نتائج.")
