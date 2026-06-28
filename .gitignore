@@ -1,0 +1,5 @@
+clinic.db
+license.key
+doctor_name.txt
+__pycache__/
+.DS_Store
